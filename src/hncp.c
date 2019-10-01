@@ -169,7 +169,7 @@ bool hncp_init(hncp o)
         .trickle_imax = HNCP_TRICKLE_IMAX,
         .trickle_k = HNCP_TRICKLE_K,
         .keepalive_interval = HNCP_KEEPALIVE_INTERVAL,
-        .maximum_unicast_size = HNCP_MAXIMUM_UNICAST_SIZE,
+        .maximum_unicast_size = HNCP_MAXIMUM_UNICAST_SIZE-HNCP_IPV6_HEADER_LEN-HNCP_UDP_HEADER_LEN,
         .maximum_multicast_size = HNCP_MAXIMUM_MULTICAST_SIZE,
         .accept_node_data_updates_via_multicast = true
       },

@@ -169,6 +169,11 @@ target_link_libraries(test_hncp_sd ubox ${BACKEND_LINK} blobmsg_json)
 add_test(hncp_sd test_hncp_sd)
 add_dependencies(check test_hncp_sd)
 
+add_executable(test_dncp_proto test/test_dncp_proto.c ${TLV})
+target_link_libraries(test_dncp_proto ubox blobmsg_json)
+add_test(dncp_proto test_dncp_proto)
+add_dependencies(check test_dncp_proto)
+
 #add_executable(test_hncp_multicast test/test_hncp_multicast.c ${HNCP_WITH_GLUE})
 #target_link_libraries(test_hncp_multicast ubox ${BACKEND_LINK} blobmsg_json)
 #add_test(hncp_multicast test_hncp_multicast)

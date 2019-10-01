@@ -38,35 +38,40 @@ _bytes_to_exp(size_t bytes)
 static bool _push_ep_id_tlv(struct tlv_buf *tb, dncp_ep_i l,
                             struct sockaddr_in6 *dst, bool always_ep_id);
 
-
-/* NOTE: The design here is definitely scary.
- *
- * The assumption is that if the container tlv-buf _has_ id, it
- * represents 1<<id byte maximum length on the wire. If that is the
- * case _or_ the tlv_buf is uninitialized, the struct tlv_buf _is_
- * within dncp_reply. Otherwise, nothing is assumed.
- */
-
 static struct tlv_attr *_push_tlv(struct tlv_buf *tb, int t, size_t len)
 {
-  if (tb->head)
+  dncp_reply reply=container_of(tb, dncp_reply_s, buf);
+  unsigned int predicted_len=0;
+  unsigned int desired_len=0; // N.B. longer packets are still sent, but unbuffered
+  L_DEBUG("_push_tlv tlv t=%i tl_overhead=%i payload_len=%i ",t,sizeof(struct tlv_attr),len);
+
+  if (tb->head && tlv_id(tb->head)>0)
     {
-      /* Consider if we would overflow */
-      int ot = tlv_id(tb->head);
-      if (ot)
+      predicted_len=(tlv_len(tb->head) + len + sizeof(struct tlv_attr));
+      desired_len=reply->l->conf.maximum_unicast_size;
+      /* Consider if we would exceed desired packet payload on the wire */
+      L_DEBUG("_push_tlv predicted len=%i desired=%i",predicted_len,desired_len);
+      if ( predicted_len > desired_len)
         {
-          dncp_reply reply = container_of(tb, dncp_reply_s, buf);
-          if ((tlv_len(tb->head) + len + sizeof(struct tlv_attr)) > (1<<ot))
-            {
-              dncp_reply_send(reply);
-              memset(tb, 0, sizeof(*tb));
-            }
+          L_DEBUG("_push_tlv sending reply to avoid long packet");
+          dncp_reply_send(reply);
+          // here the buffer has been freed and len set to zero via tlv_buf_free
+          // in dhcp_reply_send, but now set head pointer to null explicitly
+          // so a new buffer is created below.
+	  tb->head=NULL;
         }
     }
+
   if (!tb->head)
     {
-      dncp_reply reply = container_of(tb, dncp_reply_s, buf);
-      tlv_buf_init(tb, _bytes_to_exp(reply->l->conf.maximum_unicast_size));
+      // The original code abused/re-purposed buffer id to encode the maximum
+      // length of 2^x which caused me some confusion (9K packet-> 8192 octets)
+      // Here the ID is simply used to check if a buffer already exists above.
+      tlv_buf_init(tb,1);
+      // _push_ep_id_tlv also calls _push_tlv recursively
+      // which means the predicted length calculation can come up a bit short.
+      // But ep id is mandatory in each udp packet, so has no nett -ve effect
+      // and will get included next time round anyway.
       if (!_push_ep_id_tlv(tb, reply->l, &reply->dst, false))
         return NULL;
     }

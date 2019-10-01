@@ -153,3 +153,5 @@ typedef struct __packed {
  * with 10+kb frames so we use this for now. It MUST be significantly
  * more than 4k, due to how code is written at the moment. */
 #define HNCP_MAXIMUM_UNICAST_SIZE 9000
+#define HNCP_UDP_HEADER_LEN 8
+#define HNCP_IPV6_HEADER_LEN 40

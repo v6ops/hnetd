@@ -1,13 +1,11 @@
 /*
  * $Id: test_dncp_proto.c $
  *
- * Author: Markus Stenberg <mstenber@cisco.com>
+ * Author: Ray Hunter (v6ops@globis.net)
  *
- * Copyright (c) 2013-2015 cisco Systems, Inc.
+ * Copyright (c) 2019 Globis Consulting BV
  *
- * Created:       Thu Nov 21 13:26:21 2013 mstenber
- * Last modified: Mon Jun 29 17:07:02 2015 mstenber
- * Edit time:     110 min
+ * Created:       Tue Oct 1 14:47:21 2019 v6ops
  *
  */
 

@@ -16,6 +16,7 @@
 //#include "hncp_proto.h"
 //#include "hncp.h"
 #include "dncp_i.h"
+#include "hnetd_time.c"
 #include "dncp_proto.h"
 #include "dncp_proto.c"
 #include "dncp.c"
